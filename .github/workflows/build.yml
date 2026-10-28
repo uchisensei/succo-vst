@@ -49,16 +49,18 @@ jobs:
       - name: Debug - list everything in build/
         shell: bash
         run: |
+          set +e  # never fail this step, even if find/head has pipe issues
           echo "===== build/ tree (depth 5) ====="
-          find build -maxdepth 5 -type f -o -type d | head -100
+          find build -maxdepth 5 -type f -o -type d 2>/dev/null | head -100 || true
           echo ""
           echo "===== Looking for any .vst3 / .component / SUCCO standalone ====="
-          find build -name '*.vst3' -o -name '*.component' -o -name 'SUCCO.exe' -o -name 'SUCCO' -type f 2>/dev/null | head -20
+          find build -name '*.vst3' -o -name '*.component' -o -name 'SUCCO.exe' -o -name 'SUCCO' -type f 2>/dev/null | head -20 || true
           echo ""
           echo "===== JUCE artefacts dir candidates ====="
           ls -la build/SUCCO_artefacts 2>/dev/null || echo "build/SUCCO_artefacts NOT FOUND"
           ls -la build/SUCCO_artifacts 2>/dev/null || echo "build/SUCCO_artifacts (American spelling) NOT FOUND"
-          find build -name '*_artefacts' -o -name '*_artifacts' -type d 2>/dev/null
+          find build -name '*_artefacts' -o -name '*_artifacts' -type d 2>/dev/null || true
+          true  # force success
 
       - name: Upload all build artefacts
         uses: actions/upload-artifact@v4
