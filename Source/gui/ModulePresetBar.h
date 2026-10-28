@@ -34,7 +34,7 @@ public:
         // Label
         presetLabel.setText ("PRESET:", juce::dontSendNotification);
         presetLabel.setColour (juce::Label::textColourId, juce::Colour (0xff9b85b8));
-        presetLabel.setFont (juce::FontOptions (10.0f, juce::Font::bold));
+        presetLabel.setFont (juce::Font (juce::FontOptions (10.0f, juce::Font::bold)));
         presetLabel.setJustificationType (juce::Justification::centredRight);
         addAndMakeVisible (presetLabel);
 
@@ -67,7 +67,7 @@ public:
                 {
                     presetManager.saveModulePreset (module, name);
                     refreshDropdown();
-                    presetCombo.setSelectedItemText (name);
+                    presetCombo.setText (name, juce::dontSendNotification);
                 }
             }
         };
@@ -82,20 +82,9 @@ public:
             const auto name = presetCombo.getText();
             if (name.isEmpty())
                 return;
-            juce::AlertWindow::showOkCancelBox (juce::MessageBoxIconType::WarningIcon,
-                "Delete preset", "Delete preset \"" + name + "\" for " + module + "?",
-                "Delete", "Cancel", this,
-                [this, name] (int result)
-                {
-                    if (result == 1)
-                    {
-                        auto file = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory)
-                                        .getChildFile ("SUCCO").getChildFile ("ModulePresets")
-                                        .getChildFile (module).getChildFile (name + ".xml");
-                        if (file.deleteFile())
-                            refreshDropdown();
-                    }
-                });
+            auto file = presetManager.getModuleFolder (module).getChildFile (name + ".xml");
+            if (file.deleteFile())
+                refreshDropdown();
         };
         styleButton (deleteBtn);
         addAndMakeVisible (deleteBtn);
@@ -115,13 +104,13 @@ public:
         styleButton (btnB);
         addAndMakeVisible (btnB);
 
-        btnStoreA.setButtonText ("»A");
+        btnStoreA.setButtonText (">A");
         btnStoreA.setTooltip ("Store current state to A");
         btnStoreA.onClick = [this] { presetManager.storeABState (module, 'A'); flashABButton ('A'); };
         styleButton (btnStoreA);
         addAndMakeVisible (btnStoreA);
 
-        btnStoreB.setButtonText ("»B");
+        btnStoreB.setButtonText (">B");
         btnStoreB.setTooltip ("Store current state to B");
         btnStoreB.onClick = [this] { presetManager.storeABState (module, 'B'); flashABButton ('B'); };
         styleButton (btnStoreB);
@@ -167,8 +156,8 @@ public:
     {
         presetCombo.clear();
         const auto list = presetManager.getModulePresets (module);
-        for (const auto& name : list)
-            presetCombo.addItem (name, presetCombo.getNumItems() + 1);
+        for (int i = 0; i < list.size(); ++i)
+            presetCombo.addItem (list[i], i + 1);
     }
 
 private:
@@ -185,7 +174,7 @@ private:
     {
         auto& btn = (slot == 'A') ? btnA : btnB;
         btn.setToggleState (true, juce::dontSendNotification);
-        juce::Timer::callAfterDelay (200, [safeBtn = juce::Component::SafePointer (&btn)]() mutable {
+        juce::Timer::callAfterDelay (200, [safeBtn = juce::Component::SafePointer<juce::TextButton> (&btn)]() {
             if (safeBtn != nullptr)
                 safeBtn->setToggleState (false, juce::dontSendNotification);
         });

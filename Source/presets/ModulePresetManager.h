@@ -6,11 +6,9 @@
 // Each module (eq_, comp_, drive_, reverb_, etc.) has its own preset library
 // stored in ~/Documents/SUCCO/ModulePresets/<module>/.
 //
-// To save: filter APVTS params by the module prefix (e.g. "eq_"), snapshot
-// them into a ValueTree, serialize to XML on disk.
-//
-// To load: deserialize XML, apply params back to APVTS.
-//
+// To save: walk the APVTS state ValueTree, filter params by the module prefix,
+// snapshot them into a ValueTree, serialize to XML on disk.
+// To load: deserialize XML, apply params back to APVTS via getParameter().
 // A/B snapshots are in-memory only (no disk file).
 // ---------------------------------------------------------------------------
 
@@ -18,6 +16,7 @@
 #include <juce_core/juce_core.h>
 #include <vector>
 #include <memory>
+#include <map>
 
 namespace succo
 {
@@ -44,33 +43,18 @@ public:
         xml.setAttribute ("name", presetName);
         xml.setAttribute ("version", "2.0");
 
-        // Snapshot matching params
+        // Snapshot matching params from APVTS state ValueTree
+        const juce::String prefix = moduleName.toLowerCase() + "_";
         juce::ValueTree snapshot ("MODULE_PARAMS");
-        auto prefix = moduleName.lowercase() + "_";
-        auto state = apvts.copyState();
-        for (auto& child : state)
-        {
-            const auto propName = child.getProperty (juce::Identifier ("id"), juce::String()).toString();
-            // The id property holds the parameter ID
-            const auto propID = child.getType().toString();
-            if (propID.startsWith (prefix))
-                snapshot.setProperty (juce::Identifier (propID), child [juce::Identifier ("value")], nullptr);
-        }
 
-        // Fallback approach: iterate APVTS parameters directly
-        // (the above may not work depending on JUCE version's ValueTree layout)
-        if (snapshot.getNumProperties() == 0)
+        auto state = apvts.copyState();
+        for (const auto& child : state)
         {
-            const auto& params = apvts.getParameters();
-            for (auto* param : params)
+            const juce::String paramID = child.getType().toString();
+            if (paramID.startsWith (prefix))
             {
-                auto pid = param->getParameterID();
-                if (pid.startsWith (prefix))
-                {
-                    snapshot.setProperty (juce::Identifier (pid),
-                                          param->getValue(),  // normalized 0..1
-                                          nullptr);
-                }
+                const float value = (float) child.getProperty (juce::Identifier ("value"), 0.0f);
+                snapshot.setProperty (juce::Identifier (paramID), value, nullptr);
             }
         }
 
@@ -98,15 +82,17 @@ public:
             return false;
 
         auto snapshot = juce::ValueTree::fromXml (*snapXml);
-        auto prefix = moduleName.lowercase() + "_";
-        const auto& params = apvts.getParameters();
-        for (auto* param : params)
+        const juce::String prefix = moduleName.toLowerCase() + "_";
+
+        // Iterate the snapshot and apply matching params
+        for (const auto& child : snapshot)
         {
-            auto pid = param->getParameterID();
-            if (pid.startsWith (prefix) && snapshot.hasProperty (juce::Identifier (pid)))
+            const juce::String paramID = child.getType().toString();
+            if (paramID.startsWith (prefix))
             {
-                const float norm = (float) snapshot [juce::Identifier (pid)];
-                param->setValueNotifyingHost (norm);
+                const float value = (float) child.getProperty (juce::Identifier ("value"), 0.0f);
+                if (auto* param = apvts.getParameter (paramID))
+                    param->setValueNotifyingHost (value);
             }
         }
         return true;
@@ -129,43 +115,54 @@ public:
     // --- A/B snapshot system (in-memory only) ---
     void storeABState (const juce::String& moduleName, char slot)
     {
-        auto prefix = moduleName.lowercase() + "_";
+        const juce::String prefix = moduleName.toLowerCase() + "_";
         juce::ValueTree snapshot ("AB_STATE");
-        const auto& params = apvts.getParameters();
-        for (auto* param : params)
+
+        auto state = apvts.copyState();
+        for (const auto& child : state)
         {
-            auto pid = param->getParameterID();
-            if (pid.startsWith (prefix))
-                snapshot.setProperty (juce::Identifier (pid), param->getValue(), nullptr);
+            const juce::String paramID = child.getType().toString();
+            if (paramID.startsWith (prefix))
+            {
+                const float value = (float) child.getProperty (juce::Identifier ("value"), 0.0f);
+                snapshot.setProperty (juce::Identifier (paramID), value, nullptr);
+            }
         }
         abStates[moduleName + "_" + juce::String::charToString (slot)] = snapshot;
     }
 
     void recallABState (const juce::String& moduleName, char slot)
     {
-        auto key = moduleName + "_" + juce::String::charToString (slot);
+        const juce::String key = moduleName + "_" + juce::String::charToString (slot);
         if (! abStates.count (key))
             return;
-        auto snapshot = abStates.at (key);
-        auto prefix = moduleName.lowercase() + "_";
-        const auto& params = apvts.getParameters();
-        for (auto* param : params)
+        auto snapshot = abStates.at (key).createCopy();
+        const juce::String prefix = moduleName.toLowerCase() + "_";
+
+        for (const auto& child : snapshot)
         {
-            auto pid = param->getParameterID();
-            if (pid.startsWith (prefix) && snapshot.hasProperty (juce::Identifier (pid)))
+            const juce::String paramID = child.getType().toString();
+            if (paramID.startsWith (prefix))
             {
-                const float norm = (float) snapshot [juce::Identifier (pid)];
-                param->setValueNotifyingHost (norm);
+                const float value = (float) child.getProperty (juce::Identifier ("value"), 0.0f);
+                if (auto* param = apvts.getParameter (paramID))
+                    param->setValueNotifyingHost (value);
             }
         }
     }
 
     void copyAToB (const juce::String& moduleName)
     {
-        auto keyA = moduleName + "_A";
-        auto keyB = moduleName + "_B";
+        const juce::String keyA = moduleName + "_A";
+        const juce::String keyB = moduleName + "_B";
         if (abStates.count (keyA))
             abStates[keyB] = abStates.at (keyA).createCopy();
+    }
+
+    // Get root folder (for the delete button in UI)
+    juce::File getModuleFolder (const juce::String& moduleName) const
+    {
+        return rootFolder.getChildFile (moduleName);
     }
 
 private:
