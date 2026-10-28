@@ -124,7 +124,7 @@ private:
     void drawSegmentMeter (juce::Graphics& g, juce::Rectangle<int> area, float level, const juce::String& label)
     {
         // Background
-        g.setColour (lookAndFeel->getKnob());
+        g.setColour (lookAndFeel->getBackgroundColour());
         g.fillRoundedRectangle (area.toFloat(), 2.0f);
 
         // Channel label

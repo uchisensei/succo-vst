@@ -141,7 +141,7 @@ public:
         pointer.startNewSubPath (centre.x, centre.y);
         pointer.lineTo (pointerX, pointerY);
         g.setColour (colYellowBright);
-        g.strokePath (pointer, juce::PathStrokeType (2.8f, juce::PathStrokeType::rounded));
+        g.strokePath (pointer, juce::PathStrokeType (2.8f));
 
         // === 6) Center cap dot ===
         g.setColour (colYellowBright);
