@@ -17,13 +17,13 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact_name: SUCCO-Windows
+            artifact_name: SuccoDue2-Windows
             cmake_extra: ''
           - os: macos-latest
-            artifact_name: SUCCO-macOS-Universal
+            artifact_name: SuccoDue2-macOS-Universal
             cmake_extra: '-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15'
           - os: ubuntu-22.04
-            artifact_name: SUCCO-Linux
+            artifact_name: SuccoDue2-Linux
             cmake_extra: ''
 
     steps:
@@ -71,9 +71,9 @@ jobs:
             build/**_artifacts/
             build/**/*.vst3
             build/**/*.component
-            build/**/SUCCO
-            build/**/SUCCO.exe
-            build/**/SUCCO Standalone*
+            build/**/SUCCO*
+            build/**/SUCCO*.exe
+            build/**/SUCCO*Standalone*
           retention-days: 30
           if-no-files-found: warn
 
