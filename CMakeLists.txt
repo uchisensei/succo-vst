@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 3.22)
 #  (no submodule init / VST3 SDK download needed by the user).
 # ---------------------------------------------------------------------------
 
-project(SUCCO VERSION 1.0.0 LANGUAGES C CXX)
+project(SuccoDue2 VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -109,21 +109,19 @@ set(SUCCO_SOURCES
     Source/gui/DisplayComponent.cpp
     Source/gui/MeterComponent.h
     Source/gui/CurveDisplayComponent.h
-    Source/gui/ModulePresetBar.h
     Source/params/ParameterManager.h
     Source/params/ParameterManager.cpp
     Source/presets/PresetManager.h
     Source/presets/PresetManager.cpp
-    Source/presets/ModulePresetManager.h
 )
 
 # ---------------------------------------------------------------------------
 # JUCE plugin target
 # ---------------------------------------------------------------------------
-juce_add_plugin(SUCCO
+juce_add_plugin(SuccoDue2
     COMPANY_NAME              "CantinaAudio"
     PLUGIN_MANUFACTURER_CODE  Cant
-    PLUGIN_CODE               Scco
+    PLUGIN_CODE               Sdu2
     FORMATS                   ${SUCCO_BUILD_FORMATS}
     IS_SYNTH                  FALSE
     NEEDS_MIDI_INPUT          FALSE
@@ -131,15 +129,15 @@ juce_add_plugin(SUCCO
     IS_MIDI_EFFECT            FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD   ${SUCCO_COPY_PLUGIN_AFTER_BUILD}
-    PRODUCT_NAME              "SUCCO"
+    PRODUCT_NAME              "SUCCO Due 2"
     PLUGIN_VST3_CATEGORY      Fx Vocal
     AU_MAIN_TYPE              kAudioUnitType_Effect
     DESCRIPTION               "SUCCO - modular vocal chain (gate / EQ / comp / de-ess / drive / double / chorus / delay / reverb / limit)"
 )
 
-target_sources(SUCCO PRIVATE ${SUCCO_SOURCES})
+target_sources(SuccoDue2 PRIVATE ${SUCCO_SOURCES})
 
-target_include_directories(SUCCO PRIVATE
+target_include_directories(SuccoDue2 PRIVATE
     Source
     Source/dsp
     Source/gui
@@ -147,7 +145,7 @@ target_include_directories(SUCCO PRIVATE
     Source/presets
 )
 
-target_compile_definitions(SUCCO PUBLIC
+target_compile_definitions(SuccoDue2 PUBLIC
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0
@@ -155,7 +153,7 @@ target_compile_definitions(SUCCO PUBLIC
     JUCE_MODAL_LOOPS_PERMITTED=1
 )
 
-target_link_libraries(SUCCO PRIVATE
+target_link_libraries(SuccoDue2 PRIVATE
     juce::juce_audio_utils
     juce::juce_dsp
     juce::juce_recommended_config_flags
@@ -163,7 +161,7 @@ target_link_libraries(SUCCO PRIVATE
     juce::juce_recommended_warning_flags
 )
 
-set_target_properties(SUCCO PROPERTIES
+set_target_properties(SuccoDue2 PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )

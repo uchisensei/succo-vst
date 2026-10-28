@@ -112,7 +112,7 @@ void SuccoAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (lookAndFeel.getTextDim());
     g.setFont (juce::Font (11.0f));
-    g.drawText ("Vocal Chain  |  v1.0",
+    g.drawText ("Vocal Chain  |  v2.0",
                 top.reduced (12, 4), juce::Justification::centredRight, true);
 }
 
@@ -235,8 +235,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, tuneSemitones, "SEMITONES", "Shift in semitoni (-12..+12)");
         addKnobTo (p, tuneAmount,    "AMOUNT",    "Quantita applicata (0..100%)");
         // Per-module preset bar
-        auto presetBar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "tune");
-        p->setPresetBar (std::move(presetBar), 30);
         // PITCH SHIFT bar
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "PITCH SHIFT",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -273,8 +271,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, gateAttack, "ATTACK",  "Tempo di attacco (ms)");
         addKnobTo (p, gateHold,    "HOLD",    "Tempo di hold (ms)");
         addKnobTo (p, gateRelease,"RELEASE", "Tempo di rilascio (ms)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "gate");
-        p->setPresetBar (std::move(pbar), 30);
         // GATE envelope visualization: open region (green) above threshold, closed region (red) below
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "ENVELOPE",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -319,8 +315,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, eqHighShelfGain, "HS GAIN", "Guadagno high shelf (dB)");
         addKnobTo (p, eqLpfOn,         "LPF ON",   "Abilita il filtro passabasso");
         addKnobTo (p, eqLpfFreq,       "LPF",      "Frequenza del passabasso (Hz)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "eq");
-        p->setPresetBar (std::move(pbar), 30);
         // FREQUENCY RESPONSE curve (sum of all 6 filters magnitude)
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "FREQUENCY RESPONSE",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -386,8 +380,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, compRelease, "RELEASE", "Tempo di rilascio (ms)");
         addKnobTo (p, compKnee,    "KNEE",    "Ammorbidimento del ginocchio (dB)");
         addKnobTo (p, compMakeup,  "MAKEUP",  "Guadagno di compensazione (dB)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "comp");
-        p->setPresetBar (std::move(pbar), 30);
         // INPUT/OUTPUT transfer curve
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "INPUT / OUTPUT",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -444,8 +436,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, deEssFreq,   "FREQ",    "Frequenza di crossover (Hz)");
         addKnobTo (p, deEssThresh, "THRESH",  "Soglia (dB)");
         addKnobTo (p, deEssAmount, "AMOUNT",  "Quantita di riduzione (0..100%)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "deess");
-        p->setPresetBar (std::move(pbar), 30);
         // FREQUENCY BAND visualization
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "FREQUENCY BAND",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -484,8 +474,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, driveShape,  "SHAPE",   "Forma del clip (0=tanh soft, 1=hard)");
         addKnobTo (p, driveTone,   "TONE",    "Tono post-tilt (-1=basso, +1=alto)");
         addKnobTo (p, driveOutput, "OUTPUT",  "Guadagno in uscita (dB)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "drive");
-        p->setPresetBar (std::move(pbar), 30);
         // WAVESHAPER curve
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "WAVESHAPER",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -558,8 +546,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, doublerAmount, "AMOUNT",  "Livello del raddoppio (0..100%)");
         addKnobTo (p, doublerTime,   "TIME",    "Tempo di ritardo (ms)");
         addKnobTo (p, doublerSpread, "SPREAD",  "Larghezza stereo (0..100%)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "doubler");
-        p->setPresetBar (std::move(pbar), 30);
         // STEREO WIDTH visualization
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "STEREO WIDTH",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -590,8 +576,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, chorusDepth,  "DEPTH",   "Profondita di modulazione (ms)");
         addKnobTo (p, chorusVoices, "VOICES",  "Numero di voci (1..4)");
         addKnobTo (p, chorusMix,   "MIX",     "Mix dry/wet");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "chorus");
-        p->setPresetBar (std::move(pbar), 30);
         // LFO WAVEFORM visualization
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "LFO WAVEFORM",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -637,8 +621,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, delayFeedback, "FEEDBACK",  "Quantita di feedback (0..95%)");
         addKnobTo (p, delayPingPong, "PING-PONG", "Modalita ping-pong");
         addKnobTo (p, delayMix,      "MIX",       "Mix dry/wet");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "delay");
-        p->setPresetBar (std::move(pbar), 30);
         // ECHO TIMELINE visualization
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "ECHO TIMELINE",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -682,8 +664,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, reverbPredelay, "PREDELAY", "Ritardo iniziale (ms)");
         addKnobTo (p, reverbLowCut,   "LOW CUT",  "Taglio basso (Hz)");
         addKnobTo (p, reverbMix,      "MIX",      "Mix dry/wet");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "reverb");
-        p->setPresetBar (std::move(pbar), 30);
         // DECAY ENVELOPE visualization
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "DECAY ENVELOPE",
             [this](juce::Graphics& g, juce::Rectangle<int> area)
@@ -739,8 +719,6 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, limitCeiling, "CEILING",   "Soglia massima di uscita (dB)");
         addKnobTo (p, limitRelease, "RELEASE",   "Tempo di rilascio (ms)");
         addKnobTo (p, limitTruePeak,"TRUE PEAK", "Controllo inter-sample peak (4x OS)");
-        auto pbar = std::make_unique<ModulePresetBar> (&lookAndFeel, processor.getModulePresetManager(), "limit");
-        p->setPresetBar (std::move(pbar), 30);
         // INPUT/OUTPUT limiting curve
         auto curve = std::make_unique<CurveDisplayComponent> (&lookAndFeel, "INPUT / OUTPUT",
             [this](juce::Graphics& g, juce::Rectangle<int> area)

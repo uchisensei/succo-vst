@@ -182,7 +182,7 @@ private:
         g.fillRect (bounds);
 
         // 3D-ish "SUCCO" text with layered shadow
-        const juce::String logoText = "SUCCO";
+        const juce::String logoText = "SUCCO Due 2";
         const juce::Font logoFont (28.0f, juce::Font::bold);
 
         // Drop shadow

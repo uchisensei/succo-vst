@@ -4,7 +4,6 @@
 #include "dsp/ChainProcessor.h"
 #include "params/ParameterManager.h"
 #include "presets/PresetManager.h"
-#include "presets/ModulePresetManager.h"
 
 // ---------------------------------------------------------------------------
 // SuccoAudioProcessor - top-level JUCE AudioProcessor.
@@ -49,7 +48,6 @@ public:
     juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; }
     ChainProcessor& getChain() { return chain; }
     PresetManager& getPresetManager() { return presets; }
-    ModulePresetManager& getModulePresetManager() { return modulePresets; }
 
     // Last measured output level (for UI meter)
     float getOutputLevelLin() const { return outputLevelLin.load(); }
@@ -62,7 +60,6 @@ private:
     juce::AudioProcessorValueTreeState apvts;
     ChainProcessor chain;
     PresetManager presets;
-    ModulePresetManager modulePresets;
 
     std::atomic<float> outputLevelLin { 0.0f };
     std::atomic<float> compressorGR { 0.0f };

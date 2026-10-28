@@ -50,7 +50,7 @@ public:
         auto state = apvts.copyState();
         juce::XmlElement xml ("SUCCO_PRESET");
         xml.setAttribute ("name", name);
-        xml.setAttribute ("version", "1.0");
+        xml.setAttribute ("version", "2.0");
         auto stateXml = state.createXml();
         xml.addChildElement (stateXml.release());
 

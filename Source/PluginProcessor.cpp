@@ -9,8 +9,7 @@ SuccoAudioProcessor::SuccoAudioProcessor()
         .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
         .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "SUCCO_PARAMS", ParameterManager::buildLayout()),
-      presets (apvts),
-      modulePresets (apvts)
+      presets (apvts)
 {
 }
 

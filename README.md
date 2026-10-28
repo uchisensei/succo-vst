@@ -1,6 +1,6 @@
-# SUCCO v2.0 — Vocal Chain Plugin Suite
+# SUCCO Due 2 v2.0 — Vocal Chain Plugin Suite
 
-**SUCCO v2.0** è un plugin VST3 / AU / Standalone per catena vocale modulare, scritto in C++20 con [JUCE 8](https://github.com/juce-framework/JUCE). È un'implementazione **originale** ispirata all'architettura classica di catena vocale (gate → EQ → comp → de-ess → drive → double → chorus → delay → reverb → limit), con estetica UI dark purple + accent giallo, **preset per-modulo** (workflow suite), visualizzatori in tempo reale per ogni modulo, e DSP migliorato (Drive 4 modalità di saturazione).
+**SUCCO Due 2 v2.0** è un plugin VST3 / AU / Standalone per catena vocale modulare, scritto in C++20 con [JUCE 8](https://github.com/juce-framework/JUCE). È un'implementazione **originale** ispirata all'architettura classica di catena vocale (gate → EQ → comp → de-ess → drive → double → chorus → delay → reverb → limit), con estetica UI dark purple + accent giallo, **preset per-modulo** (workflow suite), visualizzatori in tempo reale per ogni modulo, e DSP migliorato (Drive 4 modalità di saturazione).
 
 > ⚠️ Questo progetto è un'opera originale. Non riproduce il codice sorgente, le risorse grafiche o il marchio di alcun plugin commerciale esistente. Il nome "SUCCO", il logo, il layout della UI e tutte le implementazioni DSP sono originali.
 
@@ -187,4 +187,4 @@ VST3 SDK: licenza Steinberg.
 
 ## Crediti
 
-SUCCO v2.0 è stato sviluppato come plugin vocale modulare originale. I concetti DSP sono basati su algoritmi pubblici standard (RBJ biquad, Freeverb, soft-clip tanh, lookahead limiter, pitch shift via crossfade delay). L'estetica UI è dark-purple con accent giallo e knob 3D custom-rendered. I preset per-modulo seguono il workflow FabFilter-style. Nessuna risorsa o codice di plugin commerciali esistenti è stata riprodotta.
+SUCCO Due 2 v2.0 è stato sviluppato come plugin vocale modulare originale. I concetti DSP sono basati su algoritmi pubblici standard (RBJ biquad, Freeverb, soft-clip tanh, lookahead limiter, pitch shift via crossfade delay). L'estetica UI è dark-purple con accent giallo e knob 3D custom-rendered. I preset per-modulo seguono il workflow FabFilter-style. Nessuna risorsa o codice di plugin commerciali esistenti è stata riprodotta.

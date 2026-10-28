@@ -15,7 +15,6 @@
 #include "gui/KnobComponent.h"
 #include "gui/MeterComponent.h"
 #include "gui/CurveDisplayComponent.h"
-#include "gui/ModulePresetBar.h"
 #include "gui/ModuleTabBar.h"
 #include "gui/DisplayComponent.h"
 #include <array>
@@ -43,16 +42,7 @@ public:
         knobs.push_back (std::move (knob));
     }
 
-    // Preset bar (placed at the very top, below the title)
-    void setPresetBar (std::unique_ptr<juce::Component> bar, int height)
-    {
-        presetBarHeight = height;
-        presetBar = std::move (bar);
-        if (presetBar != nullptr)
-            addAndMakeVisible (*presetBar);
-    }
-
-    // Top component (curve display, etc.) — below the preset bar
+    // Top component (curve display, etc.)
     void setTopComponent (std::unique_ptr<juce::Component> comp, int height)
     {
         topHeight = height;
@@ -93,14 +83,6 @@ public:
         auto b = getLocalBounds().reduced (8);
         b.removeFromTop (22); // title bar
 
-        // Preset bar at the very top
-        if (presetBar != nullptr && presetBarHeight > 0)
-        {
-            auto pb = b.removeFromTop (presetBarHeight).reduced (2);
-            presetBar->setBounds (pb);
-            b.removeFromTop (4);
-        }
-
         // Top component (curve display)
         if (topComponent != nullptr && topHeight > 0)
         {
@@ -133,7 +115,7 @@ public:
             knobs[i]->setBounds (cell);
         }
 
-        if (! ownedComponents.empty() && topComponent == nullptr && rightComponent == nullptr && presetBar == nullptr)
+        if (! ownedComponents.empty() && topComponent == nullptr && rightComponent == nullptr)
             for (auto& c : ownedComponents)
                 c->setBounds (b);
     }
@@ -143,10 +125,8 @@ public:
 
     std::vector<std::unique_ptr<KnobComponent>> knobs;
     std::vector<std::unique_ptr<juce::Component>> ownedComponents;
-    std::unique_ptr<juce::Component> presetBar;
     std::unique_ptr<juce::Component> topComponent;
     std::unique_ptr<juce::Component> rightComponent;
-    int presetBarHeight = 0;
     int topHeight = 0;
     int rightWidth = 0;
     SuccoLookAndFeel* lookAndFeel = nullptr;
