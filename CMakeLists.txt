@@ -109,10 +109,12 @@ set(SUCCO_SOURCES
     Source/gui/DisplayComponent.cpp
     Source/gui/MeterComponent.h
     Source/gui/CurveDisplayComponent.h
+    Source/gui/ModulePresetBar.h
     Source/params/ParameterManager.h
     Source/params/ParameterManager.cpp
     Source/presets/PresetManager.h
     Source/presets/PresetManager.cpp
+    Source/presets/ModulePresetManager.h
 )
 
 # ---------------------------------------------------------------------------
