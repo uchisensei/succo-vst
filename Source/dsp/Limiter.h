@@ -67,7 +67,6 @@ public:
         if (! params.enabled)
             return;
 
-        const int localNumChannels = buffer.getNumChannels();
         const int numSamples  = buffer.getNumSamples();
         if (numSamples == 0) return;
 

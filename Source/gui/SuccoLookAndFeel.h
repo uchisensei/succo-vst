@@ -55,7 +55,8 @@ public:
         setColour (juce::Slider::rotarySliderFillColourId, colAccent);
         setColour (juce::Slider::rotarySliderOutlineColourId, colKnob);
 
-        juce::Font::setDefaultSansSerifTypefaceName ("Verdana");
+        // JUCE 8: this is a member of LookAndFeel, not Font. 'this' is a LookAndFeel subclass.
+        setDefaultSansSerifTypefaceName ("Verdana");
     }
 
     // -------- Custom knob drawing --------

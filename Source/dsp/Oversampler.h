@@ -59,16 +59,23 @@ public:
         }
 
         juce::dsp::AudioBlock<float> inBlock (buffer);
+        // processSamplesUp returns a block aliasing internal oversampled memory
         auto upBlock = os.front()->processSamplesUp (inBlock);
 
+        // Copy to a temp buffer the lambda can safely modify
         juce::AudioBuffer<float> upBuffer ((int) upBlock.getNumChannels(),
                                            (int) upBlock.getNumSamples());
-        juce::dsp::AudioBlock<float> (upBuffer).copyFrom (upBlock);
+        juce::dsp::AudioBlock<float> upBufBlock (upBuffer);
+        upBufBlock.copyFrom (upBlock);
 
         processUp (upBuffer);
 
-        juce::dsp::AudioBlock<float> upBack (upBuffer);
-        os.front()->processSamplesDown (inBlock, upBack);
+        // Copy the modified up-sampled data back into the oversampler's internal memory
+        upBlock.copyFrom (upBufBlock);
+
+        // processSamplesDown in JUCE 8 takes ONLY the output block (single arg).
+        // It reads from the internal oversampled memory (which we just updated).
+        os.front()->processSamplesDown (inBlock);
     }
 
     double getUpSampleRate() const { return upSpec.sampleRate; }
