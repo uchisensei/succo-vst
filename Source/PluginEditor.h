@@ -14,6 +14,7 @@
 #include "gui/SuccoLookAndFeel.h"
 #include "gui/KnobComponent.h"
 #include "gui/MeterComponent.h"
+#include "gui/CurveDisplayComponent.h"
 #include "gui/ModuleTabBar.h"
 #include "gui/DisplayComponent.h"
 #include <array>
@@ -23,8 +24,9 @@ namespace succo
 {
 
 // A panel holds a set of knobs for one module tab.
-// Optional: an "extra component" (meter / curve display) positioned at the top
-// of the panel, taking a configurable height.
+// Optional extra components:
+//   - topComponent (e.g. curve display, spectrum analyzer) at the TOP, full-width
+//   - rightComponent (e.g. vertical GR meter) on the RIGHT, full-height
 class ModulePanel : public juce::Component
 {
 public:
@@ -37,14 +39,26 @@ public:
         knobs.push_back (std::move (knob));
     }
 
-    // Set an extra component (meter, curve display, etc.) at the top of the panel
-    void setExtraComponent (std::unique_ptr<juce::Component> comp, int height)
+    // Top component (full-width, fixed height) — for curve displays, spectrum analyzers, etc.
+    void setTopComponent (std::unique_ptr<juce::Component> comp, int height)
     {
-        extraHeight = height;
-        extraComponent = std::move (comp);
-        if (extraComponent != nullptr)
-            addAndMakeVisible (*extraComponent);
+        topHeight = height;
+        topComponent = std::move (comp);
+        if (topComponent != nullptr)
+            addAndMakeVisible (*topComponent);
     }
+
+    // Right component (full-height, fixed width) — for vertical GR meters, etc.
+    void setRightComponent (std::unique_ptr<juce::Component> comp, int width)
+    {
+        rightWidth = width;
+        rightComponent = std::move (comp);
+        if (rightComponent != nullptr)
+            addAndMakeVisible (*rightComponent);
+    }
+
+    // Backwards-compatible alias: existing code calls setExtraComponent — treat as setRightComponent
+    void setExtraComponent (std::unique_ptr<juce::Component> comp, int w) { setRightComponent (std::move (comp), w); }
 
     // Take ownership of any non-knob child (Label, TextButton, etc.)
     template <typename T>
@@ -67,17 +81,24 @@ public:
         auto b = getLocalBounds().reduced (8);
         b.removeFromTop (22); // title bar
 
-        // Reserve space for extra component on the right side (full height)
-        // Used for vertical GR meters, etc.
-        if (extraComponent != nullptr && extraHeight > 0)
+        // Top component (curve display) at the top
+        if (topComponent != nullptr && topHeight > 0)
         {
-            auto extraArea = b.removeFromRight (extraHeight).reduced (2); // height == width here
-            extraComponent->setBounds (extraArea);
+            auto topArea = b.removeFromTop (topHeight).reduced (2);
+            topComponent->setBounds (topArea);
+            b.removeFromTop (4);
+        }
+
+        // Right component (meter) on the right
+        if (rightComponent != nullptr && rightWidth > 0)
+        {
+            auto rightArea = b.removeFromRight (rightWidth).reduced (2);
+            rightComponent->setBounds (rightArea);
             b.removeFromRight (4);
         }
 
-        // Knob grid below
-        const int cols = 4;
+        // Knob grid in the remaining area
+        const int cols = juce::jmax (1, b.getWidth() / 100);
         const int rows = (int) std::ceil ((float) knobs.size() / (float) cols);
         const int itemW = b.getWidth() / cols;
         const int itemH = juce::jmin (b.getHeight() / std::max (1, rows), 100);
@@ -92,8 +113,8 @@ public:
             knobs[i]->setBounds (cell);
         }
 
-        // Owned non-knob components fill the same area
-        if (! ownedComponents.empty() && extraComponent == nullptr)
+        // Owned non-knob components fill the same area (only when no top component)
+        if (! ownedComponents.empty() && topComponent == nullptr && rightComponent == nullptr)
             for (auto& c : ownedComponents)
                 c->setBounds (b);
     }
@@ -103,8 +124,10 @@ public:
 
     std::vector<std::unique_ptr<KnobComponent>> knobs;
     std::vector<std::unique_ptr<juce::Component>> ownedComponents;
-    std::unique_ptr<juce::Component> extraComponent;
-    int extraHeight = 0;
+    std::unique_ptr<juce::Component> topComponent;
+    std::unique_ptr<juce::Component> rightComponent;
+    int topHeight = 0;
+    int rightWidth = 0;
     SuccoLookAndFeel* lookAndFeel = nullptr;
     juce::String panelTitle;
 };

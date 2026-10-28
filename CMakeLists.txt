@@ -108,6 +108,7 @@ set(SUCCO_SOURCES
     Source/gui/DisplayComponent.h
     Source/gui/DisplayComponent.cpp
     Source/gui/MeterComponent.h
+    Source/gui/CurveDisplayComponent.h
     Source/params/ParameterManager.h
     Source/params/ParameterManager.cpp
     Source/presets/PresetManager.h
