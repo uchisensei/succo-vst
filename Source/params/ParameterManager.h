@@ -107,113 +107,112 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout buildLayout()
     {
         using namespace juce;
-        using ID = ParamIDs;
         AudioProcessorValueTreeState::ParameterLayout layout;
 
         // ---- Master ----
         layout.add (std::make_unique<AudioParameterFloat>(
-            ParameterID { ID::inputGain },   "Input",    NormalisableRange<float> (-24.0f, 24.0f, 0.1f), 0.0f,
+            ParameterID { ParamIDs::inputGain },   "Input",    NormalisableRange<float> (-24.0f, 24.0f, 0.1f), 0.0f,
             AudioParameterFloatAttributes().withLabel ("dB").withStringFromValueFunction ([](float v, int){ return juce::String (v, 1) + " dB"; })));
         layout.add (std::make_unique<AudioParameterFloat>(
-            ParameterID { ID::outputGain },  "Output",   NormalisableRange<float> (-24.0f, 24.0f, 0.1f), 0.0f,
+            ParameterID { ParamIDs::outputGain },  "Output",   NormalisableRange<float> (-24.0f, 24.0f, 0.1f), 0.0f,
             AudioParameterFloatAttributes().withLabel ("dB").withStringFromValueFunction ([](float v, int){ return juce::String (v, 1) + " dB"; })));
         layout.add (std::make_unique<AudioParameterFloat>(
-            ParameterID { ID::mix },         "Mix",      NormalisableRange<float> (0.0f, 1.0f, 0.001f), 1.0f,
+            ParameterID { ParamIDs::mix },         "Mix",      NormalisableRange<float> (0.0f, 1.0f, 0.001f), 1.0f,
             AudioParameterFloatAttributes().withStringFromValueFunction ([](float v, int){ return juce::String (int (v * 100.0f)) + " %"; })));
         layout.add (std::make_unique<AudioParameterFloat>(
-            ParameterID { ID::punch },       "Punch",    NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.5f,
+            ParameterID { ParamIDs::punch },       "Punch",    NormalisableRange<float> (0.0f, 1.0f, 0.001f), 0.5f,
             AudioParameterFloatAttributes().withStringFromValueFunction ([](float v, int){ return juce::String (int (v * 100.0f)) + " %"; })));
         layout.add (std::make_unique<AudioParameterChoice>(
-            ParameterID { ID::activeModule }, "Active Module",
+            ParameterID { ParamIDs::activeModule }, "Active Module",
             StringArray { "HOME", "TUNE", "GATE", "EQ", "COMP", "DE-ESS", "DRIVE", "DOUBLE", "CHORUS", "DELAY", "VERB", "LIMIT", "PRESETS" },
             0));
 
         // ---- Tune ----
-        addChoice (layout, ID::tuneEnable, "Tune Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::tuneSemitones, "Tune Semitones", -12.0f, 12.0f, 0.01f, 0.0f, [](float v){ return juce::String (v, 2) + " st"; });
-        addFloat  (layout, ID::tuneAmount, "Tune Amount", 0.0f, 1.0f, 0.001f, 0.0f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::tuneEnable, "Tune Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::tuneSemitones, "Tune Semitones", -12.0f, 12.0f, 0.01f, 0.0f, [](float v){ return juce::String (v, 2) + " st"; });
+        addFloat  (layout, ParamIDs::tuneAmount, "Tune Amount", 0.0f, 1.0f, 0.001f, 0.0f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Gate ----
-        addChoice (layout, ID::gateEnable, "Gate Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::gateThresh, "Gate Threshold", -80.0f, 0.0f, 0.1f, -60.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::gateRange, "Gate Range", 0.0f, 80.0f, 0.1f, 40.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::gateAttack, "Gate Attack", 0.1f, 100.0f, 0.1f, 1.0f, [](float v){ return juce::String (v, 2) + " ms"; });
-        addFloat  (layout, ID::gateHold, "Gate Hold", 0.0f, 500.0f, 0.1f, 20.0f, [](float v){ return juce::String (v, 1) + " ms"; });
-        addFloat  (layout, ID::gateRelease, "Gate Release", 1.0f, 1000.0f, 0.1f, 80.0f, [](float v){ return juce::String (v, 1) + " ms"; });
+        addChoice (layout, ParamIDs::gateEnable, "Gate Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::gateThresh, "Gate Threshold", -80.0f, 0.0f, 0.1f, -60.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::gateRange, "Gate Range", 0.0f, 80.0f, 0.1f, 40.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::gateAttack, "Gate Attack", 0.1f, 100.0f, 0.1f, 1.0f, [](float v){ return juce::String (v, 2) + " ms"; });
+        addFloat  (layout, ParamIDs::gateHold, "Gate Hold", 0.0f, 500.0f, 0.1f, 20.0f, [](float v){ return juce::String (v, 1) + " ms"; });
+        addFloat  (layout, ParamIDs::gateRelease, "Gate Release", 1.0f, 1000.0f, 0.1f, 80.0f, [](float v){ return juce::String (v, 1) + " ms"; });
 
         // ---- EQ ----
-        addChoice (layout, ID::eqEnable, "EQ Enable", { "Off", "On" }, 1);
-        addChoice (layout, ID::eqHpfOn, "HPF On", { "Off", "On" }, 0);
-        addFloat  (layout, ID::eqHpfFreq, "HPF Frequency", 20.0f, 1000.0f, 0.1f, 80.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::eqLowShelfFreq, "Low Shelf Freq", 30.0f, 1000.0f, 0.1f, 120.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::eqLowShelfGain, "Low Shelf Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::eqLowMidFreq, "Low-Mid Freq", 100.0f, 2000.0f, 0.1f, 350.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::eqLowMidQ, "Low-Mid Q", 0.1f, 6.0f, 0.01f, 0.9f, [](float v){ return juce::String (v, 2); });
-        addFloat  (layout, ID::eqLowMidGain, "Low-Mid Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::eqHighMidFreq, "High-Mid Freq", 1000.0f, 12000.0f, 0.1f, 3000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::eqHighMidQ, "High-Mid Q", 0.1f, 6.0f, 0.01f, 0.9f, [](float v){ return juce::String (v, 2); });
-        addFloat  (layout, ID::eqHighMidGain, "High-Mid Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::eqHighShelfFreq, "High Shelf Freq", 2000.0f, 20000.0f, 0.1f, 8000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::eqHighShelfGain, "High Shelf Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addChoice (layout, ID::eqLpfOn, "LPF On", { "Off", "On" }, 0);
-        addFloat  (layout, ID::eqLpfFreq, "LPF Frequency", 1000.0f, 20000.0f, 0.1f, 16000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addChoice (layout, ParamIDs::eqEnable, "EQ Enable", { "Off", "On" }, 1);
+        addChoice (layout, ParamIDs::eqHpfOn, "HPF On", { "Off", "On" }, 0);
+        addFloat  (layout, ParamIDs::eqHpfFreq, "HPF Frequency", 20.0f, 1000.0f, 0.1f, 80.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::eqLowShelfFreq, "Low Shelf Freq", 30.0f, 1000.0f, 0.1f, 120.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::eqLowShelfGain, "Low Shelf Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::eqLowMidFreq, "Low-Mid Freq", 100.0f, 2000.0f, 0.1f, 350.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::eqLowMidQ, "Low-Mid Q", 0.1f, 6.0f, 0.01f, 0.9f, [](float v){ return juce::String (v, 2); });
+        addFloat  (layout, ParamIDs::eqLowMidGain, "Low-Mid Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::eqHighMidFreq, "High-Mid Freq", 1000.0f, 12000.0f, 0.1f, 3000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::eqHighMidQ, "High-Mid Q", 0.1f, 6.0f, 0.01f, 0.9f, [](float v){ return juce::String (v, 2); });
+        addFloat  (layout, ParamIDs::eqHighMidGain, "High-Mid Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::eqHighShelfFreq, "High Shelf Freq", 2000.0f, 20000.0f, 0.1f, 8000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::eqHighShelfGain, "High Shelf Gain", -18.0f, 18.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addChoice (layout, ParamIDs::eqLpfOn, "LPF On", { "Off", "On" }, 0);
+        addFloat  (layout, ParamIDs::eqLpfFreq, "LPF Frequency", 1000.0f, 20000.0f, 0.1f, 16000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
 
         // ---- Comp ----
-        addChoice (layout, ID::compEnable, "Comp Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::compThresh, "Comp Threshold", -60.0f, 0.0f, 0.1f, -20.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::compRatio, "Comp Ratio", 1.0f, 20.0f, 0.01f, 3.0f, [](float v){ return juce::String (v, 2) + " : 1"; });
-        addFloat  (layout, ID::compAttack, "Comp Attack", 0.1f, 200.0f, 0.1f, 5.0f, [](float v){ return juce::String (v, 2) + " ms"; });
-        addFloat  (layout, ID::compRelease, "Comp Release", 1.0f, 1000.0f, 0.1f, 100.0f, [](float v){ return juce::String (v, 1) + " ms"; });
-        addFloat  (layout, ID::compKnee, "Comp Knee", 0.0f, 24.0f, 0.1f, 6.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::compMakeup, "Comp Makeup", -24.0f, 24.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addChoice (layout, ParamIDs::compEnable, "Comp Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::compThresh, "Comp Threshold", -60.0f, 0.0f, 0.1f, -20.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::compRatio, "Comp Ratio", 1.0f, 20.0f, 0.01f, 3.0f, [](float v){ return juce::String (v, 2) + " : 1"; });
+        addFloat  (layout, ParamIDs::compAttack, "Comp Attack", 0.1f, 200.0f, 0.1f, 5.0f, [](float v){ return juce::String (v, 2) + " ms"; });
+        addFloat  (layout, ParamIDs::compRelease, "Comp Release", 1.0f, 1000.0f, 0.1f, 100.0f, [](float v){ return juce::String (v, 1) + " ms"; });
+        addFloat  (layout, ParamIDs::compKnee, "Comp Knee", 0.0f, 24.0f, 0.1f, 6.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::compMakeup, "Comp Makeup", -24.0f, 24.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
 
         // ---- De-Ess ----
-        addChoice (layout, ID::deEssEnable, "De-Ess Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::deEssFreq, "De-Ess Freq", 2000.0f, 12000.0f, 0.1f, 6500.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::deEssThresh, "De-Ess Threshold", -60.0f, 0.0f, 0.1f, -28.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::deEssAmount, "De-Ess Amount", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::deEssEnable, "De-Ess Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::deEssFreq, "De-Ess Freq", 2000.0f, 12000.0f, 0.1f, 6500.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::deEssThresh, "De-Ess Threshold", -60.0f, 0.0f, 0.1f, -28.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::deEssAmount, "De-Ess Amount", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Drive ----
-        addChoice (layout, ID::driveEnable, "Drive Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::driveDrive, "Drive Drive", 0.0f, 24.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
-        addFloat  (layout, ID::driveShape, "Drive Shape", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
-        addFloat  (layout, ID::driveTone, "Drive Tone", -1.0f, 1.0f, 0.001f, 0.0f, [](float v){ return juce::String (v, 2); });
-        addFloat  (layout, ID::driveOutput, "Drive Output", -24.0f, 12.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addChoice (layout, ParamIDs::driveEnable, "Drive Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::driveDrive, "Drive Drive", 0.0f, 24.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
+        addFloat  (layout, ParamIDs::driveShape, "Drive Shape", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addFloat  (layout, ParamIDs::driveTone, "Drive Tone", -1.0f, 1.0f, 0.001f, 0.0f, [](float v){ return juce::String (v, 2); });
+        addFloat  (layout, ParamIDs::driveOutput, "Drive Output", -24.0f, 12.0f, 0.1f, 0.0f, [](float v){ return juce::String (v, 1) + " dB"; });
 
         // ---- Doubler ----
-        addChoice (layout, ID::doublerEnable, "Doubler Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::doublerAmount, "Doubler Amount", 0.0f, 1.0f, 0.001f, 0.4f, [](float v){ return juce::String (int (v*100)) + " %"; });
-        addFloat  (layout, ID::doublerTime, "Doubler Time", 5.0f, 40.0f, 0.1f, 18.0f, [](float v){ return juce::String (v, 1) + " ms"; });
-        addFloat  (layout, ID::doublerSpread, "Doubler Spread", 0.0f, 1.0f, 0.001f, 0.7f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::doublerEnable, "Doubler Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::doublerAmount, "Doubler Amount", 0.0f, 1.0f, 0.001f, 0.4f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addFloat  (layout, ParamIDs::doublerTime, "Doubler Time", 5.0f, 40.0f, 0.1f, 18.0f, [](float v){ return juce::String (v, 1) + " ms"; });
+        addFloat  (layout, ParamIDs::doublerSpread, "Doubler Spread", 0.0f, 1.0f, 0.001f, 0.7f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Chorus ----
-        addChoice (layout, ID::chorusEnable, "Chorus Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::chorusRate, "Chorus Rate", 0.05f, 5.0f, 0.001f, 0.6f, [](float v){ return juce::String (v, 3) + " Hz"; });
-        addFloat  (layout, ID::chorusDepth, "Chorus Depth", 0.0f, 10.0f, 0.01f, 2.5f, [](float v){ return juce::String (v, 2) + " ms"; });
-        addChoice (layout, ID::chorusVoices, "Chorus Voices", { "1", "2", "3", "4" }, 1);
-        addFloat  (layout, ID::chorusMix, "Chorus Mix", 0.0f, 1.0f, 0.001f, 0.3f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::chorusEnable, "Chorus Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::chorusRate, "Chorus Rate", 0.05f, 5.0f, 0.001f, 0.6f, [](float v){ return juce::String (v, 3) + " Hz"; });
+        addFloat  (layout, ParamIDs::chorusDepth, "Chorus Depth", 0.0f, 10.0f, 0.01f, 2.5f, [](float v){ return juce::String (v, 2) + " ms"; });
+        addChoice (layout, ParamIDs::chorusVoices, "Chorus Voices", { "1", "2", "3", "4" }, 1);
+        addFloat  (layout, ParamIDs::chorusMix, "Chorus Mix", 0.0f, 1.0f, 0.001f, 0.3f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Delay ----
-        addChoice (layout, ID::delayEnable, "Delay Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::delayTime, "Delay Time", 1.0f, 2000.0f, 0.1f, 250.0f, [](float v){ return juce::String (int (v)) + " ms"; });
-        addFloat  (layout, ID::delayFeedback, "Delay Feedback", 0.0f, 0.95f, 0.001f, 0.35f, [](float v){ return juce::String (int (v*100)) + " %"; });
-        addChoice (layout, ID::delayPingPong, "Delay Ping-Pong", { "Off", "On" }, 0);
-        addFloat  (layout, ID::delayMix, "Delay Mix", 0.0f, 1.0f, 0.001f, 0.25f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::delayEnable, "Delay Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::delayTime, "Delay Time", 1.0f, 2000.0f, 0.1f, 250.0f, [](float v){ return juce::String (int (v)) + " ms"; });
+        addFloat  (layout, ParamIDs::delayFeedback, "Delay Feedback", 0.0f, 0.95f, 0.001f, 0.35f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::delayPingPong, "Delay Ping-Pong", { "Off", "On" }, 0);
+        addFloat  (layout, ParamIDs::delayMix, "Delay Mix", 0.0f, 1.0f, 0.001f, 0.25f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Reverb ----
-        addChoice (layout, ID::reverbEnable, "Reverb Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::reverbSize, "Reverb Size", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
-        addFloat  (layout, ID::reverbDecay, "Reverb Decay", 0.1f, 5.0f, 0.01f, 1.2f, [](float v){ return juce::String (v, 2) + " s"; });
-        addFloat  (layout, ID::reverbDamp, "Reverb Damp", 500.0f, 20000.0f, 0.1f, 4000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::reverbPredelay, "Reverb Predelay", 0.0f, 250.0f, 0.1f, 0.0f, [](float v){ return juce::String (int (v)) + " ms"; });
-        addFloat  (layout, ID::reverbLowCut, "Reverb Low Cut", 20.0f, 1000.0f, 0.1f, 100.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
-        addFloat  (layout, ID::reverbMix, "Reverb Mix", 0.0f, 1.0f, 0.001f, 0.25f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addChoice (layout, ParamIDs::reverbEnable, "Reverb Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::reverbSize, "Reverb Size", 0.0f, 1.0f, 0.001f, 0.5f, [](float v){ return juce::String (int (v*100)) + " %"; });
+        addFloat  (layout, ParamIDs::reverbDecay, "Reverb Decay", 0.1f, 5.0f, 0.01f, 1.2f, [](float v){ return juce::String (v, 2) + " s"; });
+        addFloat  (layout, ParamIDs::reverbDamp, "Reverb Damp", 500.0f, 20000.0f, 0.1f, 4000.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::reverbPredelay, "Reverb Predelay", 0.0f, 250.0f, 0.1f, 0.0f, [](float v){ return juce::String (int (v)) + " ms"; });
+        addFloat  (layout, ParamIDs::reverbLowCut, "Reverb Low Cut", 20.0f, 1000.0f, 0.1f, 100.0f, [](float v){ return juce::String (int (v)) + " Hz"; });
+        addFloat  (layout, ParamIDs::reverbMix, "Reverb Mix", 0.0f, 1.0f, 0.001f, 0.25f, [](float v){ return juce::String (int (v*100)) + " %"; });
 
         // ---- Limiter ----
-        addChoice (layout, ID::limitEnable, "Limiter Enable", { "Off", "On" }, 1);
-        addFloat  (layout, ID::limitCeiling, "Limiter Ceiling", -12.0f, 0.0f, 0.01f, -0.3f, [](float v){ return juce::String (v, 2) + " dB"; });
-        addFloat  (layout, ID::limitRelease, "Limiter Release", 1.0f, 500.0f, 0.1f, 50.0f, [](float v){ return juce::String (v, 1) + " ms"; });
-        addChoice (layout, ID::limitTruePeak, "Limiter True Peak", { "Off", "On" }, 1);
+        addChoice (layout, ParamIDs::limitEnable, "Limiter Enable", { "Off", "On" }, 1);
+        addFloat  (layout, ParamIDs::limitCeiling, "Limiter Ceiling", -12.0f, 0.0f, 0.01f, -0.3f, [](float v){ return juce::String (v, 2) + " dB"; });
+        addFloat  (layout, ParamIDs::limitRelease, "Limiter Release", 1.0f, 500.0f, 0.1f, 50.0f, [](float v){ return juce::String (v, 1) + " ms"; });
+        addChoice (layout, ParamIDs::limitTruePeak, "Limiter True Peak", { "Off", "On" }, 1);
 
         return layout;
     }
