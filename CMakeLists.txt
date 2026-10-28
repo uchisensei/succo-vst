@@ -27,6 +27,15 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ---------------------------------------------------------------------------
+# macOS deployment target — set to Catalina (10.15) for backwards compat.
+# Can be overridden by passing -DCMAKE_OSX_DEPLOYMENT_TARGET=<version> on the
+# command line.
+# ---------------------------------------------------------------------------
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "macOS min deployment target" FORCE)
+endif()
+
+# ---------------------------------------------------------------------------
 # Pull JUCE via FetchContent (no submodule needed)
 # ---------------------------------------------------------------------------
 include(FetchContent)
