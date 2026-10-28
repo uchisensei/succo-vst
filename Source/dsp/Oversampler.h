@@ -38,7 +38,7 @@ public:
             o->initProcessing (spec.maximumBlockSize);
 
         upSpec = spec;
-        upSpec.numSamples = os.front()->getOversamplingFactor() * spec.maximumBlockSize;
+        upSpec.maximumBlockSize = os.front()->getOversamplingFactor() * spec.maximumBlockSize;
         upSpec.sampleRate = spec.sampleRate * os.front()->getOversamplingFactor();
     }
 

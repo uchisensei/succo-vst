@@ -353,7 +353,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         hint->setColour (juce::Label::textColourId, lookAndFeel.getTextColour());
         hint->setJustificationType (juce::Justification::centred);
         hint->setFont (juce::Font (14.0f));
-        p->addAndMakeVisible (std::move (hint));  // transfers ownership
+        p->addOwned (std::move (hint));  // transfers ownership to the panel
     }
 
     // PRESETS (12)
@@ -380,7 +380,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
                 }
             }
         };
-        p->addAndMakeVisible (std::move (saveBtn));  // transfers ownership
+        p->addOwned (std::move (saveBtn));  // transfers ownership to the panel
     }
 }
 

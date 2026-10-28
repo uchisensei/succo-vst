@@ -33,6 +33,16 @@ public:
         knobs.push_back (std::move (knob));
     }
 
+    // Take ownership of any non-knob child (Label, TextButton, etc.)
+    template <typename T>
+    T* addOwned (std::unique_ptr<T> comp)
+    {
+        auto* raw = comp.get();
+        addAndMakeVisible (*raw);
+        ownedComponents.push_back (std::move (comp));
+        return raw;
+    }
+
     void resized() override
     {
         auto b = getLocalBounds().reduced (8);
@@ -50,9 +60,15 @@ public:
                                                      itemW, itemH).reduced (4);
             knobs[i]->setBounds (cell);
         }
+
+        // Owned non-knob components (labels, buttons) fill the same area
+        if (! ownedComponents.empty())
+            for (auto& c : ownedComponents)
+                c->setBounds (b);
     }
 
     std::vector<std::unique_ptr<KnobComponent>> knobs;
+    std::vector<std::unique_ptr<juce::Component>> ownedComponents;
 };
 
 class SuccoAudioProcessorEditor : public juce::AudioProcessorEditor,

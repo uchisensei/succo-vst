@@ -9,6 +9,8 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include <array>
+#include "../params/ParameterManager.h"
 #include "SuccoLookAndFeel.h"
 
 namespace succo
@@ -109,14 +111,14 @@ private:
     bool isBypassed (size_t tabIndex) const
     {
         using namespace ParamIDs;
-        // Map tab index -> bypass parameter
-        static const char* bypassParams[] = {
-            nullptr, // HOME
+        // Map tab index -> bypass parameter name (nullptr = no bypass control)
+        static constexpr std::array<const char*, 13> bypassParams = {
+            nullptr,           // HOME
             tuneEnable, gateEnable, eqEnable, compEnable, deEssEnable,
             driveEnable, doublerEnable, chorusEnable, delayEnable,
-            reverbEnable, limitEnable, nullptr // PRESETS
+            reverbEnable, limitEnable, nullptr  // PRESETS
         };
-        if (tabIndex < sizeof (bypassParams) / sizeof (bypassParams[0]))
+        if (tabIndex < bypassParams.size())
         {
             if (auto* p = bypassParams[tabIndex])
             {

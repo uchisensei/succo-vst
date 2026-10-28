@@ -32,7 +32,7 @@ public:
     void paint (juce::Graphics& g) override
     {
         if (lookAndFeel == nullptr) return;
-        const auto b = getLocalBounds();
+        auto b = getLocalBounds();
         lookAndFeel->drawDisplayBackground (g, b);
 
         // Title bar

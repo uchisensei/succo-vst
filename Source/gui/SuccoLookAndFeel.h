@@ -55,7 +55,7 @@ public:
         setColour (juce::Slider::rotarySliderFillColourId, colAccent);
         setColour (juce::Slider::rotarySliderOutlineColourId, colKnob);
 
-        setDefaultSansserifTypefaceName ("Verdana");
+        juce::Font::setDefaultSansSerifTypefaceName ("Verdana");
     }
 
     // -------- Custom knob drawing --------
@@ -77,14 +77,14 @@ public:
         bgRing.addCentredArc (centre.x, centre.y, trackRadius, trackRadius,
             0.0f, startAngle, endAngle, true);
         g.setColour (colKnob);
-        g.strokePath (bgRing, juce::PathStrokeType (trackWidth, juce::PathStrokeType::curved));
+        g.strokePath (bgRing, juce::PathStrokeType (trackWidth));
 
         // Filled arc up to current pos
         juce::Path fillRing;
         fillRing.addCentredArc (centre.x, centre.y, trackRadius, trackRadius,
             0.0f, startAngle, angle, true);
         g.setColour (colKnobFill);
-        g.strokePath (fillRing, juce::PathStrokeType (trackWidth, juce::PathStrokeType::curved));
+        g.strokePath (fillRing, juce::PathStrokeType (trackWidth));
 
         // Inner knob disc with radial gradient
         const float knobRadius = radius * 0.55f;
@@ -111,7 +111,7 @@ public:
         pointer.startNewSubPath (centre.x, centre.y);
         pointer.lineTo (pointerX, pointerY);
         g.setColour (colAccentBright);
-        g.strokePath (pointer, juce::PathStrokeType (2.5f, juce::PathStrokeType::rounded));
+        g.strokePath (pointer, juce::PathStrokeType (2.5f));
     }
 
     // -------- Display panel background --------
