@@ -107,6 +107,7 @@ set(SUCCO_SOURCES
     Source/gui/ModuleTabBar.cpp
     Source/gui/DisplayComponent.h
     Source/gui/DisplayComponent.cpp
+    Source/gui/MeterComponent.h
     Source/params/ParameterManager.h
     Source/params/ParameterManager.cpp
     Source/presets/PresetManager.h

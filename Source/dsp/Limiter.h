@@ -62,6 +62,9 @@ public:
         }
     }
 
+    // Expose current gain reduction for UI meter (dB reduction, 0 = no reduction)
+    float getGainReductionDb() const { return lastGrDb; }
+
     void process (juce::AudioBuffer<float>& buffer)
     {
         if (! params.enabled)
@@ -112,6 +115,11 @@ public:
             else
                 gainState = (float)(targetGain - (targetGain - gainState) * releaseCoef);
 
+            // Track gain reduction for UI meter
+            lastGrDb = (gainState > 0.001f)
+                ? juce::jlimit (0.0f, 24.0f, -20.0f * std::log10 (gainState))
+                : 24.0f;
+
             // Apply gain, then push current input to lookahead (post-GC)
             for (int c = 0; c < numChannels; ++c)
             {
@@ -148,6 +156,7 @@ private:
     Oversampler oversampler;
     float gainState = 1.0f;
     float targetGain = 1.0f;
+    float lastGrDb = 0.0f;
 };
 
 } // namespace succo

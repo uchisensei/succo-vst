@@ -154,6 +154,12 @@ void SuccoAudioProcessorEditor::resized()
 void SuccoAudioProcessorEditor::timerCallback()
 {
     refreshPresetLabel();
+
+    // Push GR data to UI meters (sign-flip so positive dB = gain reduction = bar grows)
+    if (compGRMeter != nullptr)
+        compGRMeter->setLevel (-processor.getCompressorGR());   // GR dB is positive when reducing; meter expects negative dB
+    if (limiterGRMeter != nullptr)
+        limiterGRMeter->setLevel (-processor.getLimiterGR());
 }
 
 void SuccoAudioProcessorEditor::tabSelected (int moduleIndex)
@@ -204,9 +210,9 @@ void SuccoAudioProcessorEditor::buildModulePanels()
     using namespace ParamIDs;
     auto& apvts = processor.getAPVTS();
 
-    auto newPanel = [this](int idx) -> ModulePanel*
+    auto newPanel = [this](int idx, const juce::String& title) -> ModulePanel*
     {
-        auto p = std::make_unique<ModulePanel>();
+        auto p = std::make_unique<ModulePanel>(&lookAndFeel, title);
         auto* raw = p.get();
         modulePanels[(size_t) idx] = std::move (p);
         addAndMakeVisible (*raw);
@@ -224,7 +230,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // TUNE (1)
     {
-        auto* p = newPanel (1);
+        auto* p = newPanel (1, "TUNE");
         addKnobTo (p, tuneEnable,     "ENABLE",    "Attiva il modulo Tune (pitch shift)");
         addKnobTo (p, tuneSemitones, "SEMITONES", "Shift in semitoni (-12..+12)");
         addKnobTo (p, tuneAmount,    "AMOUNT",    "Quantita applicata (0..100%)");
@@ -232,7 +238,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // GATE (2)
     {
-        auto* p = newPanel (2);
+        auto* p = newPanel (2, "GATE");
         addKnobTo (p, gateEnable, "ENABLE",  "Attiva il gate");
         addKnobTo (p, gateThresh, "THRESH",  "Soglia (dB sotto la quale il gate si chiude)");
         addKnobTo (p, gateRange,  "RANGE",   "Attenuazione a gate chiuso (dB)");
@@ -243,7 +249,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // EQ (3)
     {
-        auto* p = newPanel (3);
+        auto* p = newPanel (3, "EQ");
         addKnobTo (p, eqEnable,        "ENABLE",   "Attiva l'equalizzatore");
         addKnobTo (p, eqHpfOn,         "HPF ON",   "Abilita il filtro passaalto");
         addKnobTo (p, eqHpfFreq,       "HPF",      "Frequenza del passaalto (Hz)");
@@ -263,7 +269,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // COMP (4)
     {
-        auto* p = newPanel (4);
+        auto* p = newPanel (4, "COMP");
         addKnobTo (p, compEnable,  "ENABLE",  "Attiva il compressore");
         addKnobTo (p, compThresh,  "THRESH",  "Soglia (dB)");
         addKnobTo (p, compRatio,   "RATIO",   "Rapporto (n:1)");
@@ -271,11 +277,19 @@ void SuccoAudioProcessorEditor::buildModulePanels()
         addKnobTo (p, compRelease, "RELEASE", "Tempo di rilascio (ms)");
         addKnobTo (p, compKnee,    "KNEE",    "Ammorbidimento del ginocchio (dB)");
         addKnobTo (p, compMakeup,  "MAKEUP",  "Guadagno di compensazione (dB)");
+
+        // Yellow GR meter on the right side of the panel (vertical)
+        auto meter = std::make_unique<MeterComponent> (&lookAndFeel,
+                                                       MeterComponent::Mode::GainReduction,
+                                                       "GR");
+        meter->setRange (-24.0f, 0.0f);
+        compGRMeter = meter.get();
+        p->setExtraComponent (std::move (meter), 60);
     }
 
     // DE-ESS (5)
     {
-        auto* p = newPanel (5);
+        auto* p = newPanel (5, "DE-ESS");
         addKnobTo (p, deEssEnable, "ENABLE",  "Attiva il de-esser");
         addKnobTo (p, deEssFreq,   "FREQ",    "Frequenza di crossover (Hz)");
         addKnobTo (p, deEssThresh, "THRESH",  "Soglia (dB)");
@@ -284,7 +298,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // DRIVE (6)
     {
-        auto* p = newPanel (6);
+        auto* p = newPanel (6, "DRIVE");
         addKnobTo (p, driveEnable, "ENABLE",  "Attiva il drive (saturation)");
         addKnobTo (p, driveDrive,  "DRIVE",   "Quantita di drive (dB)");
         addKnobTo (p, driveShape,  "SHAPE",   "Forma del clip (0=tanh soft, 1=hard)");
@@ -294,7 +308,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // DOUBLE (7)
     {
-        auto* p = newPanel (7);
+        auto* p = newPanel (7, "DOUBLE");
         addKnobTo (p, doublerEnable, "ENABLE",  "Attiva il doubler (raddoppio vocale)");
         addKnobTo (p, doublerAmount, "AMOUNT",  "Livello del raddoppio (0..100%)");
         addKnobTo (p, doublerTime,   "TIME",    "Tempo di ritardo (ms)");
@@ -303,7 +317,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // CHORUS (8)
     {
-        auto* p = newPanel (8);
+        auto* p = newPanel (8, "CHORUS");
         addKnobTo (p, chorusEnable, "ENABLE",  "Attiva il chorus");
         addKnobTo (p, chorusRate,   "RATE",    "Velocita del LFO (Hz)");
         addKnobTo (p, chorusDepth,  "DEPTH",   "Profondita di modulazione (ms)");
@@ -313,7 +327,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // DELAY (9)
     {
-        auto* p = newPanel (9);
+        auto* p = newPanel (9, "DELAY");
         addKnobTo (p, delayEnable,   "ENABLE",    "Attiva il delay");
         addKnobTo (p, delayTime,     "TIME",      "Tempo di ritardo (ms)");
         addKnobTo (p, delayFeedback, "FEEDBACK",  "Quantita di feedback (0..95%)");
@@ -323,7 +337,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // VERB (10)
     {
-        auto* p = newPanel (10);
+        auto* p = newPanel (10, "VERB");
         addKnobTo (p, reverbEnable,   "ENABLE",   "Attiva la reverb");
         addKnobTo (p, reverbSize,     "SIZE",     "Dimensione della stanza (0..100%)");
         addKnobTo (p, reverbDecay,    "DECAY",    "Tempo di decadimento (s)");
@@ -335,16 +349,24 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // LIMIT (11)
     {
-        auto* p = newPanel (11);
+        auto* p = newPanel (11, "LIMIT");
         addKnobTo (p, limitEnable,  "ENABLE",    "Attiva il limitatore");
         addKnobTo (p, limitCeiling, "CEILING",   "Soglia massima di uscita (dB)");
         addKnobTo (p, limitRelease, "RELEASE",   "Tempo di rilascio (ms)");
         addKnobTo (p, limitTruePeak,"TRUE PEAK", "Controllo inter-sample peak (4x OS)");
+
+        // Yellow GR meter on the right side (vertical)
+        auto meter = std::make_unique<MeterComponent> (&lookAndFeel,
+                                                       MeterComponent::Mode::GainReduction,
+                                                       "GR");
+        meter->setRange (-18.0f, 0.0f);
+        limiterGRMeter = meter.get();
+        p->setExtraComponent (std::move (meter), 60);
     }
 
     // HOME (0) - intro text
     {
-        auto* p = newPanel (0);
+        auto* p = newPanel (0, "HOME");
         auto hint = std::make_unique<juce::Label>("hint",
             "SUCCO Vocal Chain\n\n"
             "Seleziona un modulo dalla barra in alto per iniziare.\n"
@@ -358,7 +380,7 @@ void SuccoAudioProcessorEditor::buildModulePanels()
 
     // PRESETS (12)
     {
-        auto* p = newPanel (12);
+        auto* p = newPanel (12, "PRESETS");
         auto saveBtn = std::make_unique<juce::TextButton>("Save Preset");
         saveBtn->setColour (juce::TextButton::buttonColourId, lookAndFeel.getAccentColour());
         saveBtn->setColour (juce::TextButton::textColourOnId, lookAndFeel.getBackgroundColour());

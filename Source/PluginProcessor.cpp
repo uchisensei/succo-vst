@@ -77,6 +77,10 @@ void SuccoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
         for (int n = 0; n < buffer.getNumSamples(); ++n)
             peak = juce::jmax (peak, std::abs (buffer.getSample (c, n)));
     outputLevelLin.store (peak);
+
+    // Push GR data to UI meters
+    compressorGR.store (chain.getCompressor().getGainReductionDb());
+    limiterGR.store (chain.getLimiter().getGainReductionDb());
 }
 
 juce::AudioProcessorEditor* SuccoAudioProcessor::createEditor()

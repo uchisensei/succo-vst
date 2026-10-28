@@ -177,6 +177,7 @@ public:
 
     // Provide read access for UI (e.g., gain-reduction meters)
     const Compressor& getCompressor() const { return comp; }
+    const Limiter&    getLimiter() const    { return limiter; }
 
 private:
     ChainParams params;

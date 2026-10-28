@@ -52,12 +52,18 @@ public:
     // Last measured output level (for UI meter)
     float getOutputLevelLin() const { return outputLevelLin.load(); }
 
+    // Gain reduction data for UI meters
+    float getCompressorGR() const { return compressorGR.load(); }
+    float getLimiterGR() const   { return limiterGR.load(); }
+
 private:
     juce::AudioProcessorValueTreeState apvts;
     ChainProcessor chain;
     PresetManager presets;
 
     std::atomic<float> outputLevelLin { 0.0f };
+    std::atomic<float> compressorGR { 0.0f };
+    std::atomic<float> limiterGR { 0.0f };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuccoAudioProcessor)
 };
