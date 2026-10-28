@@ -36,8 +36,8 @@ public:
         toneLow.prepare  ({ spec.sampleRate, spec.maximumBlockSize, numCh });
         toneHigh.prepare ({ spec.sampleRate, spec.maximumBlockSize, numCh });
 
-        toneLow.coefficients  = juce::dsp::IIR::Coefficients<float>::makeLowShelf  (spec.sampleRate, 800.0, 0.707f, 1.0f);
-        toneHigh.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (spec.sampleRate, 4000.0, 0.707f, 1.0f);
+        toneLow.state  = juce::dsp::IIR::Coefficients<float>::makeLowShelf  (spec.sampleRate, 800.0, 0.707f, 1.0f);
+        toneHigh.state = juce::dsp::IIR::Coefficients<float>::makeHighShelf (spec.sampleRate, 4000.0, 0.707f, 1.0f);
 
         oversampler.prepare (spec, params.oversample);
         updateTone();
@@ -107,9 +107,9 @@ private:
         const float lowGainDb  = std::abs (t) * 6.0f * (t <= 0.0f ? 1.0f : -0.2f);
 
         const double sr = sampleRate;
-        toneLow.coefficients  = juce::dsp::IIR::Coefficients<float>::makeLowShelf  (sr, 800.0, 0.707f,
+        toneLow.state  = juce::dsp::IIR::Coefficients<float>::makeLowShelf  (sr, 800.0, 0.707f,
             juce::Decibels::decibelsToGain (lowGainDb));
-        toneHigh.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighShelf (sr, 4000.0, 0.707f,
+        toneHigh.state = juce::dsp::IIR::Coefficients<float>::makeHighShelf (sr, 4000.0, 0.707f,
             juce::Decibels::decibelsToGain (highGainDb));
     }
 

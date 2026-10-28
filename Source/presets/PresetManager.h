@@ -22,7 +22,7 @@ public:
         buildFactoryPresets();
         userFolder = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory)
                         .getChildFile ("SUCCO").getChildFile ("Presets");
-        userFolder.createDirectoryTree();
+        userFolder.createDirectory();
         refreshUserPresets();
     }
 
@@ -54,7 +54,7 @@ public:
         auto stateXml = state.createXml();
         xml.addChildElement (stateXml.release());
 
-        userFolder.createDirectoryTree();
+        userFolder.createDirectory();
         const auto file = userFolder.getChildFile (name + ".succo");
         xml.writeTo (file);
 
@@ -210,7 +210,7 @@ private:
                 cp.eq.highShelfGain = 1.5f;
                 cp.reverb.mix = 0.06f;
                 cp.reverb.decay = 0.6f;
-                cp.doublerBypass = true;
+                cp.doubleBypass = true;
                 cp.chorusBypass = true;
                 cp.delayBypass = true;
                 cp.driveBypass = true;

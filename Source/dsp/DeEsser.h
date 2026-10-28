@@ -125,8 +125,8 @@ private:
     void updateCoefficients()
     {
         const double sr = sampleRate;
-        lpFilter.coefficients = Coeffs::makeLowPass (sr, params.freq, 0.707f);
-        hpFilter.coefficients = Coeffs::makeHighPass (sr, params.freq, 0.707f);
+        lpFilter.state = Coeffs::makeLowPass (sr, params.freq, 0.707f);
+        hpFilter.state = Coeffs::makeHighPass (sr, params.freq, 0.707f);
     }
 
     Params params;

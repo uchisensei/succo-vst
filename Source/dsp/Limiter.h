@@ -29,7 +29,7 @@ public:
     {
         sampleRate = spec.sampleRate;
         maxBlock   = spec.maximumBlockSize;
-        const auto numCh = static_cast<juce::uint32> (spec.numChannels);
+        numChannels = static_cast<juce::uint32> (spec.numChannels);
         // Lookahead buffer (5ms)
         const size_t lookSamp = (size_t) std::ceil (0.005 * sampleRate);
         lookBuf.assign (numChannels, std::vector<float> (lookSamp, 0.0f));
@@ -143,6 +143,7 @@ private:
     Params params;
     double sampleRate = 44100.0;
     juce::uint32 maxBlock = 0;
+    juce::uint32 numChannels = 2;
     std::vector<std::vector<float>> lookBuf;
     std::vector<size_t> lookPos;
     Oversampler oversampler;

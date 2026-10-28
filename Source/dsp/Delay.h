@@ -34,7 +34,7 @@ public:
         delayL.prepare (spec);
         delayR.prepare (spec);
         hpFilter.prepare (spec);
-        hpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (sampleRate, 200.0, 0.707f);
+        hpFilter.state = juce::dsp::IIR::Coefficients<float>::makeHighPass (sampleRate, 200.0, 0.707f);
         reset();
     }
 
@@ -49,7 +49,7 @@ public:
     void setParams (const Params& p)
     {
         params = p;
-        hpFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (sampleRate, params.hpFreq, 0.707f);
+        hpFilter.state = juce::dsp::IIR::Coefficients<float>::makeHighPass (sampleRate, params.hpFreq, 0.707f);
     }
 
     void process (juce::AudioBuffer<float>& buffer)

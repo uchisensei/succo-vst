@@ -79,21 +79,21 @@ private:
     {
         const double sr = sampleRate;
         // HPF
-        filters[0].coefficients = Coeffs::makeHighPass (sr, params.hpfFreq, 0.707f);
+        filters[0].state = Coeffs::makeHighPass (sr, params.hpfFreq, 0.707f);
         // Low shelf
-        filters[1].coefficients = Coeffs::makeLowShelf (sr, params.lowShelfFreq, 0.707f,
+        filters[1].state = Coeffs::makeLowShelf (sr, params.lowShelfFreq, 0.707f,
             juce::Decibels::decibelsToGain (params.lowShelfGain));
         // Low-mid bell
-        filters[2].coefficients = Coeffs::makePeakFilter (sr, params.lowMidFreq, params.lowMidQ,
+        filters[2].state = Coeffs::makePeakFilter (sr, params.lowMidFreq, params.lowMidQ,
             juce::Decibels::decibelsToGain (params.lowMidGain));
         // High-mid bell
-        filters[3].coefficients = Coeffs::makePeakFilter (sr, params.highMidFreq, params.highMidQ,
+        filters[3].state = Coeffs::makePeakFilter (sr, params.highMidFreq, params.highMidQ,
             juce::Decibels::decibelsToGain (params.highMidGain));
         // High shelf
-        filters[4].coefficients = Coeffs::makeHighShelf (sr, params.highShelfFreq, 0.707f,
+        filters[4].state = Coeffs::makeHighShelf (sr, params.highShelfFreq, 0.707f,
             juce::Decibels::decibelsToGain (params.highShelfGain));
         // LPF
-        filters[5].coefficients = Coeffs::makeLowPass (sr, params.lpfFreq, 0.707f);
+        filters[5].state = Coeffs::makeLowPass (sr, params.lpfFreq, 0.707f);
     }
 
     Params params;

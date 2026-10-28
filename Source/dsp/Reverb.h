@@ -37,10 +37,8 @@ public:
         predelay.prepare (spec);
         predelay.reset();
 
-        for (auto& c : combs)
-            c.prepare (spec), c.reset();
-        for (auto& a : allpass)
-            a.prepare (spec), a.reset();
+        for (auto& c : combs) { c.prepare (spec); c.reset(); }
+        for (auto& a : allpass) { a.prepare (spec); a.reset(); }
 
         dampFilter.prepare (spec);
         lowcutFilter.prepare (spec);
@@ -81,8 +79,8 @@ public:
             const float inR = (numChannels >= 2) ? buffer.getSample (1, n) : inL;
             const float mono = (inL + inR) * 0.5f;
 
-            // HP/LP on input
-            float inHpL = lowcutFilter.processSample (0, mono);
+            // HP on input (single-channel IIR::Filter via processSample)
+            const float inHpL = lowcutFilter.processSample (mono);
 
             // Predelay
             predelay.pushSample (0, inHpL);
@@ -97,11 +95,10 @@ public:
             for (size_t i = 0; i < allpass.size(); ++i)
                 sum = allpass[i].process (sum);
 
-            // Damp on feedback
-            const float dampedWet = dampFilter.processSample (0, sum);
+            // Damp on feedback (single-channel LP via processSample)
+            const float dampedWet = dampFilter.processSample (sum);
 
             const float wet = dampedWet;
-            // Output L = dry + wet; Output R = dry + wet (with slight L/R variation from stereo spread)
             const float dryL = inL;
             const float dryR = inR;
             buffer.setSample (0, n, dryL * (1.0f - params.mix) + wet * params.mix);
@@ -160,18 +157,14 @@ private:
 
     void updateParams()
     {
-        // Standard Freeverb comb times (samples @ 44.1kHz) scaled by size and decay RT60
-        // [1116, 1188, 1277, 1356] for combs; [556, 441, 341, 225] for allpass (Freeverb).
-        // We'll size to current sample rate and scale by decay.
         const double srScale = sampleRate / 44100.0;
-        const float sizeScale = 0.5f + 1.5f * params.size; // 0.5..2.0
+        const float sizeScale = 0.5f + 1.5f * params.size;
         const float decayScale = juce::jlimit (0.1f, 4.0f, params.decay);
 
-        // Comb feedback = 10^(-3 * dt / RT60) where dt = comb delay seconds
         auto setComb = [&](Comb& c, int baseSamp)
         {
             const size_t delaySamp = (size_t) std::max ((int) 1, (int) std::ceil (baseSamp * srScale * sizeScale));
-            const double dt = delaySamp / sampleRate;
+            const double dt = (double) delaySamp / sampleRate;
             const double rt60 = decayScale;
             const float feedback = (float) std::pow (10.0, -3.0 * dt / rt60);
             c.setParams (delaySamp, juce::jlimit (0.0f, 0.999f, feedback));
@@ -190,8 +183,8 @@ private:
         setAp (allpass[0], 556);
         setAp (allpass[1], 441);
 
-        // Damping / low-cut filters
-        dampFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeLowPass (sampleRate, params.damp, 0.707f);
+        // Damping / low-cut filters (use direct IIR::Filter<float> for single-sample processing)
+        dampFilter.coefficients   = juce::dsp::IIR::Coefficients<float>::makeLowPass  (sampleRate, params.damp, 0.707f);
         lowcutFilter.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass (sampleRate, params.lowCut, 0.707f);
     }
 
@@ -202,10 +195,9 @@ private:
     std::array<Comb, 4> combs;
     std::array<Allpass, 2> allpass;
 
-    using Filter = juce::dsp::IIR::Filter<float>;
-    using Coeffs = juce::dsp::IIR::Coefficients<float>;
-    juce::dsp::ProcessorDuplicator<Filter, Coeffs> dampFilter;
-    juce::dsp::ProcessorDuplicator<Filter, Coeffs> lowcutFilter;
+    // Direct single-channel IIR::Filter (NOT ProcessorDuplicator — those lack processSample)
+    juce::dsp::IIR::Filter<float> dampFilter;
+    juce::dsp::IIR::Filter<float> lowcutFilter;
 };
 
 } // namespace succo
